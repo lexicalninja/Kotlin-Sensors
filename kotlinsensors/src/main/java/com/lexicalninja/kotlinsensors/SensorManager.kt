@@ -105,7 +105,7 @@ class SensorManager : Service() {
         super.onCreate()
         registerReceiver(applicationInBGReceiver, IntentFilter(APPLICATION_IN_BACKGROUND))
         registerReceiver(applicationInFGReceiver, IntentFilter(APPLICATION_IN_FOREGROUND))
-        registerReceiver(sessionControllerScanReceiver, IntentFilter(START_SENSOR_SCAN))
+        registerReceiver(startScanReceiver, IntentFilter(START_SENSOR_SCAN))
         if (bluetoothAdapter == null) {
             Log.e(TAG, "Unable to obtain a BluetoothAdapter.")
         }
@@ -139,7 +139,7 @@ class SensorManager : Service() {
         super.onDestroy()
         unregisterReceiver(applicationInBGReceiver)
         unregisterReceiver(applicationInFGReceiver)
-        unregisterReceiver(sessionControllerScanReceiver)
+        unregisterReceiver(startScanReceiver)
         stopScan()
     }
 
@@ -246,7 +246,7 @@ class SensorManager : Service() {
         }
     }
 
-    private val sessionControllerScanReceiver = object : BroadcastReceiver() {
+    private val startScanReceiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, p1: Intent?) {
             startScan(ManagerState.PassiveScan)
         }

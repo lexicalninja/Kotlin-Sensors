@@ -13,7 +13,7 @@ private const val TAG = "BleSensor"
 
 open class BleSensor(
     val device: BluetoothDevice?,
-    internal val context: Context,
+    val context: Context,
     val advertisements: Array<UUID> = arrayOf()
 ) : ICharacteristicObserver {
 
