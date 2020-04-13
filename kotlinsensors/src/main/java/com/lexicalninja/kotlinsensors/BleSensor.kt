@@ -1,46 +1,46 @@
-package com.kinetic.fit.kotlinsensors
+package com.lexicalninja.kotlinsensors
 
 import android.bluetooth.*
 import android.content.Context
 import android.content.Context.BLUETOOTH_SERVICE
 import androidx.annotation.UiThread
-import com.kinetic.fit.kotlinsensors.SensorManager.Companion.RssiPingInterval
-import com.lexicalninja.kotlinsensors.BleCharacteristic
-import com.lexicalninja.kotlinsensors.ICharacteristicObserver
+import com.kinetic.fit.kotlinsensors.BleService
+import com.lexicalninja.kotlinsensors.SensorManager.Companion.RssiPingInterval
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.properties.Delegates
 
 private const val TAG = "BleSensor"
 
-open class BleSensor(val device: BluetoothDevice?, internal val context: Context, val advertisements: Array<UUID> = arrayOf())
-    : ICharacteristicObserver {
-    interface Observer {
-        fun sensorStateChanged(sensor: BleSensor, state: State)
-        fun rssiValueChanged(sensor: BleSensor, rssi: Int)
-        fun sensorServiceDiscovered(service: BleService)
-        fun sensorServiceFeaturesIdentified(sensor: BleSensor, service: BleService)
-        fun sensorCharacteristicValueChanged(sensor: BleSensor, characteristic: BleCharacteristic)
-        fun sensorCharacteristicDiscovered(characteristic: BleCharacteristic)
+open class BleSensor(
+    val device: BluetoothDevice?,
+    internal val context: Context,
+    val advertisements: Array<UUID> = arrayOf()
+) : ICharacteristicObserver {
+
+    //    Last time of Sensor Communication with the Sensor Manager
+
+
+    open var observers: MutableSet<Observer> = Collections.newSetFromMap(WeakHashMap())
+    private val bluetoothManager: BluetoothManager by lazy {
+        context.getSystemService(
+            BLUETOOTH_SERVICE
+        ) as BluetoothManager
     }
-
-    open var observers: MutableSet<Observer> = Collections.newSetFromMap<Observer>(WeakHashMap<Observer, Boolean>())
-    open fun addObserver(observer: Observer) = observers.add(observer)
-    open fun removeObserver(observer: Observer) = observers.remove(observer)
-
-    private val bluetoothManager: BluetoothManager by lazy { context.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager }
     internal var bluetoothGatt: BluetoothGatt? = null
-    private var operationQueue: Queue<BluetoothOperation> = LinkedList<BluetoothOperation>()
-
+    private var operationQueue: Queue<BluetoothOperation> = LinkedList()
     open val sensorId: String = device?.address ?: "No Device"
     open val name: String = device?.name ?: "No Device"
     private var rssiPingTimer: Timer? = null
-
-    private var rssiPingEnable: Boolean by Delegates.observable(false) { prop, old, new ->
+    private var rssiPingEnable: Boolean by Delegates.observable(false) { _, _, new ->
         if (new) {
             if (rssiPingTimer == null) {
                 rssiPingTimer = Timer()
-                rssiPingTimer!!.scheduleAtFixedRate(PingTimerTask(), Date(), RssiPingInterval.toLong())
+                rssiPingTimer!!.scheduleAtFixedRate(
+                    PingTimerTask(),
+                    Date(),
+                    RssiPingInterval.toLong()
+                )
             }
         } else {
             rssi = Int.MIN_VALUE
@@ -49,39 +49,125 @@ open class BleSensor(val device: BluetoothDevice?, internal val context: Context
             rssiPingTimer = null
         }
     }
+    internal var serviceFactory: WeakReference<SensorManager.ServiceFactory>? = null
+        private set
+    var services: MutableMap<String, BleService> = mutableMapOf()
+        private set
+    var rssi: Int by Delegates.observable(Int.MIN_VALUE) { _, _, new ->
+        notifyObserversRssiChanged(new)
+    }
+        internal set
+    var lastSensorActivity = Date().time
 
+    /**
+     *
+     *     GATT Callbacks
+     *
+     **/
+
+    private val gattCallbacks = object : BluetoothGattCallback() {
+
+        override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
+//            Log.d(TAG, "onConnectionStateChange (${device?.name}) $newState status: $status")
+
+            try {
+                when (newState) {
+                    BluetoothProfile.STATE_CONNECTED -> {
+                        bluetoothGatt?.discoverServices()
+                        rssiPingEnable = true
+                    }
+                    BluetoothProfile.STATE_DISCONNECTED -> {
+                        bluetoothGatt?.close()
+                        bluetoothGatt = null
+                        rssiPingEnable = false
+                        services.clear()
+                    }
+                    BluetoothProfile.STATE_CONNECTING -> {
+//                        Log.d(TAG, "Connecting to device")
+                    }
+                    BluetoothProfile.STATE_DISCONNECTING -> {
+//                        Log.d(TAG, "Disconnecting from device")
+                    }
+                }
+            } catch (e: NullPointerException) {
+                e.printStackTrace()
+            }
+            notifyObserversStateChanged()
+            markSensorActivity()
+        }
+
+        override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
+            processServices(gatt)
+            markSensorActivity()
+        }
+
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic
+        ) {
+            processCharacteristicValue(characteristic)
+            markSensorActivity()
+        }
+
+        override fun onCharacteristicRead(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            status: Int
+        ) {
+            processCharacteristicValue(characteristic)
+            operationQueue.remove()
+            processQueue()
+            markSensorActivity()
+        }
+
+        override fun onCharacteristicWrite(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            status: Int
+        ) {
+            characteristicValueWritten(characteristic)
+            operationQueue.remove()
+            processQueue()
+            markSensorActivity()
+        }
+
+        override fun onDescriptorRead(
+            gatt: BluetoothGatt,
+            descriptor: BluetoothGattDescriptor,
+            status: Int
+        ) {
+            operationQueue.remove()
+            processQueue()
+            markSensorActivity()
+        }
+
+        override fun onDescriptorWrite(
+            gatt: BluetoothGatt,
+            descriptor: BluetoothGattDescriptor,
+            status: Int
+        ) {
+            operationQueue.remove()
+            processQueue()
+            markSensorActivity()
+        }
+
+        override fun onReadRemoteRssi(gatt: BluetoothGatt?, rssi: Int, status: Int) {
+            this@BleSensor.rssi = rssi
+            operationQueue.remove()
+            processQueue()
+            markSensorActivity()
+        }
+    }
+
+    open fun addObserver(observer: Observer) = observers.add(observer)
+    open fun removeObserver(observer: Observer) = observers.remove(observer)
     internal fun markSensorActivity() {
         lastSensorActivity = Date().time
     }
 
-    private inner class PingTimerTask : TimerTask() {
-        override fun run() {
-            if (getState() == State.Connected) {
-                readRemoteRssi()
-            }
-        }
-    }
-
-    internal var serviceFactory: WeakReference<SensorManager.ServiceFactory>? = null
-        private set
-
     fun setServiceFactory(factory: SensorManager.ServiceFactory) {
         this.serviceFactory = WeakReference(factory)
     }
-
-    enum class State { Connecting, Connected, Disconnecting, Disconnected }
-
-    var services: MutableMap<String, BleService> = mutableMapOf()
-        private set
-
-    var rssi: Int by Delegates.observable(Int.MIN_VALUE) { prop, old, new ->
-        notifyObserversRssiChanged(new)
-    }
-        internal set
-
-    //    Last time of Sensor Communication with the Sensor Manager
-
-    var lastSensorActivity = Date().time
 
     override fun equals(other: Any?): Boolean {
         if (other !is BleSensor) return false
@@ -101,7 +187,6 @@ open class BleSensor(val device: BluetoothDevice?, internal val context: Context
     }
 
     override fun onValueWritten(characteristic: BleCharacteristic) {}
-
     inline fun <reified T : BleService?> service(uuid: String? = null): T? {
         return if (uuid != null && services[uuid] is T) {
             services[uuid] as T
@@ -185,51 +270,10 @@ open class BleSensor(val device: BluetoothDevice?, internal val context: Context
         }
     }
 
-
-    /**
-     *
-     *       Bluetooth QUEUE operations
-     *
-     **/
-
-    private interface BluetoothOperation {
-        fun execute(gatt: BluetoothGatt)
-    }
-
-    private inner class BluetoothOperationWriteDescriptor(internal var mDescriptor: BluetoothGattDescriptor) : BluetoothOperation {
-        override fun execute(gatt: BluetoothGatt) {
-            val w = gatt.writeDescriptor(mDescriptor)
-        }
-    }
-
-    private inner class BluetoothOperationReadDescriptor(internal var mDescriptor: BluetoothGattDescriptor) : BluetoothOperation {
-        override fun execute(gatt: BluetoothGatt) {
-            gatt.readDescriptor(mDescriptor)
-        }
-    }
-
-    private inner class BluetoothOperationReadCharacteristic(internal var mCharacteristic: BluetoothGattCharacteristic) : BluetoothOperation {
-        override fun execute(gatt: BluetoothGatt) {
-            gatt.readCharacteristic(mCharacteristic)
-        }
-    }
-
-    private inner class BluetoothOperationWriteCharacteristic(internal var mCharacteristic: BluetoothGattCharacteristic) : BluetoothOperation {
-        override fun execute(gatt: BluetoothGatt) {
-            val w = gatt.writeCharacteristic(mCharacteristic)
-        }
-    }
-
-    private inner class BluetoothOperationReadRemoteRssi : BluetoothOperation {
-        override fun execute(gatt: BluetoothGatt) {
-            val w = gatt.readRemoteRssi()
-        }
-    }
-
     private fun processQueue() {
         if (!operationQueue.isEmpty() && bluetoothGatt != null) {
             val qItem = operationQueue.peek()
-            bluetoothGatt?.run { qItem.execute(this) }
+            bluetoothGatt?.run { qItem?.execute(this) }
         }
     }
 
@@ -309,7 +353,8 @@ open class BleSensor(val device: BluetoothDevice?, internal val context: Context
         gatt.services?.forEach {
             if (services.keys.contains(it.uuid.toString().toUpperCase())) return
 
-            val iServiceFactory = serviceFactory?.get()?.serviceTypes?.get(it.uuid.toString().toUpperCase())
+            val iServiceFactory =
+                serviceFactory?.get()?.serviceTypes?.get(it.uuid.toString().toUpperCase())
 
             iServiceFactory?.apply {
                 val service = create(it, WeakReference(this@BleSensor))
@@ -324,7 +369,9 @@ open class BleSensor(val device: BluetoothDevice?, internal val context: Context
     private fun discoverCharacteristics(service: BleService) {
         service.gattService.characteristics.forEach {
             if (service.characteristics.keys.contains(it.uuid.toString().toUpperCase())) return
-            val iServiceFactory = serviceFactory?.get()?.serviceTypes?.get(service.gattService.uuid.toString().toUpperCase())
+            val iServiceFactory = serviceFactory?.get()?.serviceTypes?.get(
+                service.gattService.uuid.toString().toUpperCase()
+            )
             iServiceFactory?.apply {
                 val characteristicType = this.characteristicTypes[it.uuid.toString().toUpperCase()]
                 characteristicType?.apply {
@@ -343,7 +390,7 @@ open class BleSensor(val device: BluetoothDevice?, internal val context: Context
         val service = services[characteristic.service.uuid.toString().toUpperCase()]
         val char = service?.characteristics?.get(characteristic.uuid.toString().toUpperCase())
         char?.valueUpdated()
-        if(characteristic.uuid.toString().substring(4, 8) != "2ad2") {
+        if (characteristic.uuid.toString().substring(4, 8) != "2ad2") {
 //            Log.d(TAG, "char ${characteristic.uuid.toString().substring(4, 8)} val: ${characteristic.value?.contentToString()}")
         }
         markSensorActivity()
@@ -355,84 +402,66 @@ open class BleSensor(val device: BluetoothDevice?, internal val context: Context
         char?.valueWritten()
     }
 
+    interface Observer {
+        fun sensorStateChanged(sensor: BleSensor, state: State)
+        fun rssiValueChanged(sensor: BleSensor, rssi: Int)
+        fun sensorServiceDiscovered(service: BleService)
+        fun sensorServiceFeaturesIdentified(sensor: BleSensor, service: BleService)
+        fun sensorCharacteristicValueChanged(sensor: BleSensor, characteristic: BleCharacteristic)
+        fun sensorCharacteristicDiscovered(characteristic: BleCharacteristic)
+    }
+
+    private inner class PingTimerTask : TimerTask() {
+        override fun run() {
+            if (getState() == State.Connected) {
+                readRemoteRssi()
+            }
+        }
+    }
+
+    enum class State { Connecting, Connected, Disconnecting, Disconnected }
+
     /**
      *
-     *     GATT Callbacks
+     *       Bluetooth QUEUE operations
      *
      **/
 
-    private val gattCallbacks = object : BluetoothGattCallback() {
+    private interface BluetoothOperation {
+        fun execute(gatt: BluetoothGatt)
+    }
 
-        override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
-//            Log.d(TAG, "onConnectionStateChange (${device?.name}) $newState status: $status")
-
-            try {
-                when (newState) {
-                    BluetoothProfile.STATE_CONNECTED -> {
-                        bluetoothGatt?.discoverServices()
-                        rssiPingEnable = true
-                    }
-                    BluetoothProfile.STATE_DISCONNECTED -> {
-                        bluetoothGatt?.close()
-                        bluetoothGatt = null
-                        rssiPingEnable = false
-                        services.clear()
-                    }
-                    BluetoothProfile.STATE_CONNECTING -> {
-//                        Log.d(TAG, "Connecting to device")
-                    }
-                    BluetoothProfile.STATE_DISCONNECTING -> {
-//                        Log.d(TAG, "Disconnecting from device")
-                    }
-                }
-            } catch (e: NullPointerException) {
-                e.printStackTrace()
-            }
-            notifyObserversStateChanged()
-            markSensorActivity()
+    private inner class BluetoothOperationWriteDescriptor(internal var mDescriptor: BluetoothGattDescriptor) :
+        BluetoothOperation {
+        override fun execute(gatt: BluetoothGatt) {
+            gatt.writeDescriptor(mDescriptor)
         }
+    }
 
-        override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
-            processServices(gatt)
-            markSensorActivity()
+    private inner class BluetoothOperationReadDescriptor(internal var mDescriptor: BluetoothGattDescriptor) :
+        BluetoothOperation {
+        override fun execute(gatt: BluetoothGatt) {
+            gatt.readDescriptor(mDescriptor)
         }
+    }
 
-        override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
-            processCharacteristicValue(characteristic)
-            markSensorActivity()
+    private inner class BluetoothOperationReadCharacteristic(internal var mCharacteristic: BluetoothGattCharacteristic) :
+        BluetoothOperation {
+        override fun execute(gatt: BluetoothGatt) {
+            gatt.readCharacteristic(mCharacteristic)
         }
+    }
 
-        override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
-            processCharacteristicValue(characteristic)
-            operationQueue.remove()
-            processQueue()
-            markSensorActivity()
+    private inner class BluetoothOperationWriteCharacteristic(internal var mCharacteristic: BluetoothGattCharacteristic) :
+        BluetoothOperation {
+        override fun execute(gatt: BluetoothGatt) {
+            gatt.writeCharacteristic(mCharacteristic)
         }
+    }
 
-        override fun onCharacteristicWrite(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
-            characteristicValueWritten(characteristic)
-            operationQueue.remove()
-            processQueue()
-            markSensorActivity()
-        }
-
-        override fun onDescriptorRead(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
-            operationQueue.remove()
-            processQueue()
-            markSensorActivity()
-        }
-
-        override fun onDescriptorWrite(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
-            operationQueue.remove()
-            processQueue()
-            markSensorActivity()
-        }
-
-        override fun onReadRemoteRssi(gatt: BluetoothGatt?, rssi: Int, status: Int) {
-            this@BleSensor.rssi = rssi
-            operationQueue.remove()
-            processQueue()
-            markSensorActivity()
+    private inner class BluetoothOperationReadRemoteRssi : BluetoothOperation {
+        override fun execute(gatt: BluetoothGatt) {
+            gatt.readRemoteRssi()
         }
     }
 }

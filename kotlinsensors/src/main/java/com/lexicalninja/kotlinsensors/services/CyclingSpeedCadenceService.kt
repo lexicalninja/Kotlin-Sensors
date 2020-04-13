@@ -2,7 +2,7 @@ package com.lexicalninja.kotlinsensors.services
 
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
-import com.kinetic.fit.kotlinsensors.BleSensor
+import com.lexicalninja.kotlinsensors.BleSensor
 import com.kinetic.fit.kotlinsensors.BleService
 import com.kinetic.fit.kotlinsensors.IServiceFactory
 import com.lexicalninja.kotlinsensors.BleCharacteristic
@@ -60,7 +60,7 @@ open class CyclingSpeedCadenceService(gattService: BluetoothGattService, sensor:
 
         var wheelCircumferenceCM: Double = 213.3
 
-        var measurementData by Delegates.observable<CyclingSpeedCadenceSerializer.MeasurementData?>(null) { prop, old, new ->
+        var measurementData by Delegates.observable<CyclingSpeedCadenceSerializer.MeasurementData?>(null) { _, old, new ->
             if (old == null || new == null) return@observable
             CyclingSerializer.calculateWheelKPH(new, old, wheelCircumferenceCM, 1024)
                     ?.apply { speedKPH = this }

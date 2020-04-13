@@ -1,4 +1,4 @@
-package com.kinetic.fit.kotlinsensors
+package com.lexicalninja.kotlinsensors
 
 data class FtmsPair<out A, out B>(val machine: A, val targetSettings: B) {
 

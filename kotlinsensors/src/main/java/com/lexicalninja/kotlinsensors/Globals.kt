@@ -1,4 +1,4 @@
-package com.kinetic.fit.kotlinsensors
+package com.lexicalninja.kotlinsensors
 
 import android.os.ParcelUuid
 

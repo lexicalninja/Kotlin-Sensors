@@ -4,7 +4,7 @@ import android.util.Log;
 
 import org.jetbrains.annotations.Nullable;
 
-import com.kinetic.fit.kotlinsensors.FtmsPair;
+import com.lexicalninja.kotlinsensors.FtmsPair;
 
 /**
  * Created by Saxton on 1/9/18.

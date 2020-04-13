@@ -2,7 +2,7 @@ package com.lexicalninja.kotlinsensors.services
 
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
-import com.kinetic.fit.kotlinsensors.BleSensor
+import com.lexicalninja.kotlinsensors.BleSensor
 import com.lexicalninja.kotlinsensors.serializers.KineticSerializer
 import com.lexicalninja.kotlinsensors.BleCharacteristic
 import com.kinetic.fit.kotlinsensors.BleService

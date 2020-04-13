@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothGattService
 import com.kinetic.fit.kotlinsensors.*
 import com.lexicalninja.kotlinsensors.serializers.HeartRateSerializer
 import com.lexicalninja.kotlinsensors.BleCharacteristic
+import com.lexicalninja.kotlinsensors.BleSensor
 import com.lexicalninja.kotlinsensors.ICharacteristicFactory
 import java.lang.ref.WeakReference
 

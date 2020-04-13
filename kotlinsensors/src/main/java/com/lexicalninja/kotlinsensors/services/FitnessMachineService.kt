@@ -2,9 +2,9 @@ package com.lexicalninja.kotlinsensors.services
 
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
-import com.kinetic.fit.kotlinsensors.BleSensor
+import com.lexicalninja.kotlinsensors.BleSensor
 import com.kinetic.fit.kotlinsensors.BleService
-import com.kinetic.fit.kotlinsensors.FTMS_UUID
+import com.lexicalninja.kotlinsensors.FTMS_UUID
 import com.kinetic.fit.kotlinsensors.IServiceFactory
 import com.lexicalninja.kotlinsensors.BleCharacteristic
 import com.lexicalninja.kotlinsensors.ICharacteristicFactory
@@ -97,7 +97,7 @@ open class FitnessMachineService(gattService: BluetoothGattService, sensor: Weak
         }
 
         init {
-            val r = readValue()
+            readValue()
         }
 
         var machine: FitnessMachineSerializer.MachineFeatures? = null
@@ -233,7 +233,7 @@ open class FitnessMachineService(gattService: BluetoothGattService, sensor: Weak
             fun factory() = Factory()
         }
 
-        var message by Delegates.observable<FitnessMachineSerializer.MachineStatusMessage?>(null) { _, old, new ->
+        var message by Delegates.observable<FitnessMachineSerializer.MachineStatusMessage?>(null) { _, _, new ->
             new?.run {
                 when (this.opCode) {
                     targetPowerChanged -> (service.get() as? FitnessMachineService)?.controlPoint?.pendingTargetPower = null
@@ -416,7 +416,7 @@ open class FitnessMachineService(gattService: BluetoothGattService, sensor: Weak
             fun factory() = Factory()
         }
 
-        var data by Delegates.observable<FitnessMachineSerializer.IndoorBikeData?>(null) { _, old, new ->
+        var data by Delegates.observable<FitnessMachineSerializer.IndoorBikeData?>(null) { _, old, _ ->
             if (old == null) {
                 service.get()?.sensor?.get()?.apply{
                     this.notifyServiceFeaturesIdentified(this, service.get()!!)

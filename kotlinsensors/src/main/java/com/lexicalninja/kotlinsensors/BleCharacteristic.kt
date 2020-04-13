@@ -44,7 +44,7 @@ open class BleCharacteristic(var service: WeakReference<BleService>, var gattCha
     }
 
     fun notify(notify: Boolean) {
-        val n = service.get()?.sensor?.get()?.setNotifyForCharacteristic(gattCharacteristic, notify)
+        service.get()?.sensor?.get()?.setNotifyForCharacteristic(gattCharacteristic, notify)
 //        val descriptor = gattCharacteristic.getDescriptor(uuid.fromString(NOTIFICATION_DESCRIPTOR))
 //        descriptor?.value = if(notify) ENABLE_NOTIFICATION_VALUE else DISABLE_NOTIFICATION_VALUE
 //        service.get()?.sensor?.get()?.writeDescriptor(descriptor)
