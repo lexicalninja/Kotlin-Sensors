@@ -1,2 +1,4 @@
 rootProject.name='KotlinSensors'
 include ':app'
+include ':kotlinsensors'
+include ':kineticsdk'
