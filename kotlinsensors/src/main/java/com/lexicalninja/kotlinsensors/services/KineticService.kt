@@ -5,9 +5,9 @@ import android.bluetooth.BluetoothGattService
 import com.lexicalninja.kotlinsensors.BleSensor
 import com.lexicalninja.kotlinsensors.serializers.KineticSerializer
 import com.lexicalninja.kotlinsensors.BleCharacteristic
-import com.kinetic.fit.kotlinsensors.BleService
+import com.lexicalninja.kotlinsensors.BleService
 import com.lexicalninja.kotlinsensors.ICharacteristicFactory
-import com.kinetic.fit.kotlinsensors.IServiceFactory
+import com.lexicalninja.kotlinsensors.IServiceFactory
 import java.lang.ref.WeakReference
 
 open class KineticService(gattService: BluetoothGattService, sensor: WeakReference<out BleSensor>)

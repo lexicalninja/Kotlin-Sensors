@@ -19,7 +19,6 @@ import android.os.Build.VERSION_CODES.M
 import android.os.IBinder
 import android.os.ParcelUuid
 import android.util.Log
-import com.kinetic.fit.kotlinsensors.IServiceFactory
 import java.util.*
 import kotlin.properties.Delegates
 import kotlin.reflect.KClass

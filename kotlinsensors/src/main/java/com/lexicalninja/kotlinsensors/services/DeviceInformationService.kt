@@ -2,11 +2,7 @@ package com.lexicalninja.kotlinsensors.services
 
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
-import com.kinetic.fit.kotlinsensors.*
-import com.lexicalninja.kotlinsensors.BleCharacteristic
-import com.lexicalninja.kotlinsensors.BleSensor
-import com.lexicalninja.kotlinsensors.ICharacteristicFactory
-import com.lexicalninja.kotlinsensors.UTF8Characteristic
+import com.lexicalninja.kotlinsensors.*
 import java.lang.ref.WeakReference
 
 class DeviceInformationService(gattService: BluetoothGattService, sensor: WeakReference<out BleSensor>)

@@ -3,9 +3,9 @@ package com.lexicalninja.kotlinsensors.services
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
 import com.lexicalninja.kotlinsensors.BleSensor
-import com.kinetic.fit.kotlinsensors.BleService
+import com.lexicalninja.kotlinsensors.BleService
 import com.lexicalninja.kotlinsensors.FTMS_UUID
-import com.kinetic.fit.kotlinsensors.IServiceFactory
+import com.lexicalninja.kotlinsensors.IServiceFactory
 import com.lexicalninja.kotlinsensors.BleCharacteristic
 import com.lexicalninja.kotlinsensors.ICharacteristicFactory
 import com.lexicalninja.kotlinsensors.serializers.FitnessMachineSerializer

@@ -1,7 +1,6 @@
 package com.lexicalninja.kotlinsensors
 
 import android.bluetooth.BluetoothGattCharacteristic
-import com.kinetic.fit.kotlinsensors.BleService
 import java.lang.ref.WeakReference
 import java.nio.charset.Charset
 

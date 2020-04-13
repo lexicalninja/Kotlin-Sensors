@@ -1,9 +1,6 @@
-package com.kinetic.fit.kotlinsensors
+package com.lexicalninja.kotlinsensors
 
 import android.bluetooth.BluetoothGattService
-import com.lexicalninja.kotlinsensors.BleCharacteristic
-import com.lexicalninja.kotlinsensors.BleSensor
-import com.lexicalninja.kotlinsensors.ICharacteristicFactory
 import java.lang.ref.WeakReference
 import kotlin.reflect.KClass
 

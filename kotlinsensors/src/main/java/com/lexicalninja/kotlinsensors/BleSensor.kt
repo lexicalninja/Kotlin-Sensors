@@ -4,7 +4,6 @@ import android.bluetooth.*
 import android.content.Context
 import android.content.Context.BLUETOOTH_SERVICE
 import androidx.annotation.UiThread
-import com.kinetic.fit.kotlinsensors.BleService
 import com.lexicalninja.kotlinsensors.SensorManager.Companion.RssiPingInterval
 import java.lang.ref.WeakReference
 import java.util.*
