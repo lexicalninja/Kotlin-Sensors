@@ -145,5 +145,5 @@ open class CyclingSpeedCadenceService(gattService: BluetoothGattService, sensor:
             super.valueUpdated()
         }
     }
-    
+
 }
