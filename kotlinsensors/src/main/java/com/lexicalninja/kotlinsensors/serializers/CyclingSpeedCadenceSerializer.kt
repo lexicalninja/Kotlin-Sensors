@@ -43,7 +43,7 @@ class CyclingSpeedCadenceSerializer {
 
     companion object {
         fun readFeatures(bytes: ByteArray): Features {
-            val rawFeatures = (bytes[0].toInt() and 0xFF or (bytes[1].toInt() or 0xFF) shl 8)
+            val rawFeatures = (bytes[0].toInt() and 0xFF) or ((bytes[1].toInt() or 0xFF) shl 8)
             return Features(rawFeatures)
         }
 
@@ -52,12 +52,18 @@ class CyclingSpeedCadenceSerializer {
             var index = 0
             val rawFlags = bytes[index++]
             if (rawFlags.hasFlag(MeasurementFlags.wheelRevolutionDataPresent)) {
-                measurement.cumulativeWheelRevolutions = (bytes[index++].toInt() and 0xFF) or (bytes[index++].toInt() and 0xFF shl 8) or (bytes[index++].toInt() and 0xFF shl 16) or (bytes[index++].toInt() and 0xFF shl 24)
-                measurement.lastWheelEventTime = (bytes[index++].toInt() and 0xff or (bytes[index++].toInt() and 0xff shl 8)).toShort()
+                measurement.cumulativeWheelRevolutions = (bytes[index++].toInt() and 0xFF) or
+                        (bytes[index++].toInt() and 0xFF shl 8) or
+                        (bytes[index++].toInt() and 0xFF shl 16) or
+                        (bytes[index++].toInt() and 0xFF shl 24)
+                measurement.lastWheelEventTime = (bytes[index++].toInt() and 0xff or
+                        (bytes[index++].toInt() and 0xff shl 8)).toShort()
             }
             if (rawFlags.hasFlag(MeasurementFlags.crankRevolutionDataPresent)) {
-                measurement.cumulativeCrankRevolutions = bytes[index++].toInt() and 0xFF or (bytes[index++].toInt() and 0xFF shl 8)
-                measurement.lastCrankEventTime = bytes[index++].toInt() and 0xFF or (bytes[index].toInt() and 0xFF shl 8)
+                measurement.cumulativeCrankRevolutions = bytes[index++].toInt() and 0xFF or
+                        (bytes[index++].toInt() and 0xFF shl 8)
+                measurement.lastCrankEventTime = (bytes[index++].toInt() and 0xFF) or
+                        (bytes[index].toInt() and 0xFF shl 8)
             }
             measurement.timeStamp = System.currentTimeMillis().toDouble()
             return measurement
