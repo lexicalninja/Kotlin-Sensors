@@ -24,7 +24,7 @@ fun SystemIdToString(systemId: ByteArray): String {
 open class FlagStruct {
     internal var rawFlags: Int = 0
 
-    operator fun contains(flagPosition: Int): Boolean {
+    fun contains(flagPosition: Int): Boolean {
         return rawFlags.toLong() and (1L shl flagPosition) == flagPosition.toLong()
     }
 
