@@ -110,7 +110,7 @@ open class CyclingSpeedCadenceService(gattService: BluetoothGattService, sensor:
 
         override fun valueUpdated() {
             gattCharacteristic.value?.takeIf { it.isNotEmpty() }?.apply {
-                features = CyclingSpeedCadenceSerializer.readFeatures(this)
+                features = CyclingSpeedCadenceSerializer.readFeatures(value)
             }
             super.valueUpdated()
             service.get()?.apply {
