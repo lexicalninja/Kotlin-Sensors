@@ -84,8 +84,8 @@ open class CyclingSpeedCadenceService(gattService: BluetoothGattService, sensor:
                 if(measurementData == null || now - measurementData!!.timeStamp > reqInterval){
                     measurementData =  CyclingSpeedCadenceSerializer.readMeasurement(value)
                 }
+                super.valueUpdated()
             }
-            super.valueUpdated()
         }
     }
 
