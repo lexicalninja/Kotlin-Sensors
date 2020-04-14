@@ -47,7 +47,7 @@ open class SensorManager : Service() {
 
     var SensorType: KClass<out BleSensor> = BleSensor::class
 
-    private val binder = SensorManagerBinder()
+    internal val binder = SensorManagerBinder()
 
     private val bluetoothManager: BluetoothManager by lazy {
         applicationContext.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
