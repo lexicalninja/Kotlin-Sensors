@@ -82,7 +82,7 @@ open class CyclingSpeedCadenceService(gattService: BluetoothGattService, sensor:
                     reqInterval = kotlin.math.max(0.5, kotlin.math.min(wheelCircumferenceCM / speedCMS * 0.9, 1.5))
                 }
                 if(measurementData == null || now - measurementData!!.timeStamp > reqInterval){
-                    measurementData =  CyclingSpeedCadenceSerializer.readMeasurement(this)
+                    measurementData =  CyclingSpeedCadenceSerializer.readMeasurement(value)
                 }
             }
             super.valueUpdated()
