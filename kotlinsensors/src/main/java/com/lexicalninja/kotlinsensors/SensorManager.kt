@@ -27,7 +27,7 @@ import kotlin.reflect.KFunction
 
 private const val TAG = "SensorManager"
 
-class SensorManager : Service() {
+open class SensorManager : Service() {
     interface Observer {
         fun onBluetoothStateChanged(state: ManagerState)
         fun onSensorDiscovered(sensor: BleSensor)
