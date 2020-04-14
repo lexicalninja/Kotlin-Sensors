@@ -20,16 +20,21 @@ fun SystemIdToString(systemId: ByteArray): String {
     }
     return sb.toString()
 }
-//class FlagStruct {
-//    internal var rawFlags: Int = 0
-//
-//    operator fun contains(flagPosition: Int): Boolean {
-//        return rawFlags.toLong() and (1L shl flagPosition) != 0L
-//    }
-//
-//    constructor() {}
-//
-//    constructor(rawFlags: Int) {
-//        this.rawFlags = rawFlags
-//    }
-//}
+
+open class FlagStruct {
+    internal var rawFlags: Int = 0
+
+    operator fun contains(flagPosition: Int): Boolean {
+        return rawFlags.toLong() and (1L shl flagPosition) == flagPosition.toLong()
+    }
+
+    constructor() {}
+
+    constructor(rawFlags: Int) {
+        this.rawFlags = rawFlags
+    }
+}
+
+fun Byte.hasFlag(flag: Int): Boolean {
+    return this.toLong() and flag.toLong() == flag.toLong()
+}

@@ -68,7 +68,7 @@ open class CyclingSpeedCadenceService(gattService: BluetoothGattService, sensor:
         }
 
         override fun valueUpdated() {
-            gattCharacteristic.value?.takeIf { !it.isEmpty() }?.apply {
+            gattCharacteristic.value?.takeIf { it.isNotEmpty() }?.apply {
                 // Certain sensors (*cough* Mio Velo *cough*) will send updates in bursts
                 // so we're going to do a little filtering here to get a more stable reading
                 val now = Date().time
@@ -81,8 +81,8 @@ open class CyclingSpeedCadenceService(gattService: BluetoothGattService, sensor:
                     // These values could probably use some tweaking ...
                     reqInterval = kotlin.math.max(0.5, kotlin.math.min(wheelCircumferenceCM / speedCMS * 0.9, 1.5))
                 }
-                if(measurementData == null || now - measurementData!!.timestamp > reqInterval){
-                    measurementData =  CyclingSpeedCadenceSerializer.readMeasurement(value)
+                if(measurementData == null || now - measurementData!!.timeStamp > reqInterval){
+                    measurementData =  CyclingSpeedCadenceSerializer.readMeasurement(this)
                 }
             }
             super.valueUpdated()
@@ -109,8 +109,8 @@ open class CyclingSpeedCadenceService(gattService: BluetoothGattService, sensor:
         var features: CyclingSpeedCadenceSerializer.Features? = null
 
         override fun valueUpdated() {
-            gattCharacteristic.value?.takeIf { !it.isEmpty() }?.apply {
-                features = CyclingSpeedCadenceSerializer.readFeatures(value)
+            gattCharacteristic.value?.takeIf { it.isNotEmpty() }?.apply {
+                features = CyclingSpeedCadenceSerializer.readFeatures(this)
             }
             super.valueUpdated()
             service.get()?.apply {
@@ -139,12 +139,11 @@ open class CyclingSpeedCadenceService(gattService: BluetoothGattService, sensor:
         var location: CyclingSerializer.SensorLocation? = null
 
         override fun valueUpdated() {
-            gattCharacteristic.value?.takeIf { !it.isEmpty() }?.apply {
-                location = CyclingSerializer.readSensorLocation(value)
+            gattCharacteristic.value?.takeIf { it.isNotEmpty() }?.apply {
+                location = CyclingSerializer.readSensorLocation(this)
             }
             super.valueUpdated()
         }
     }
-
-
+    
 }
