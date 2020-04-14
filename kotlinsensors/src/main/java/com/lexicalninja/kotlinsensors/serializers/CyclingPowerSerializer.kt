@@ -25,10 +25,10 @@ class CyclingPowerSerializer {
 
     class Features(rawFlags: Int) : FlagStruct(rawFlags) {
         val isWheelRevolutionDataSupported: Boolean
-            get() = contains(WheelRevolutionDataSupported)
+            get() = WheelRevolutionDataSupported in this@Features
 
         val isCrankRevolutionDataSupported: Boolean
-            get() = contains(CrankRevolutionDataSupported)
+            get() = CrankRevolutionDataSupported in this@Features
 
         val PedalPowerBalanceSupported = 1
         val AccumulatedTorqueSupported = 1 shl 1
