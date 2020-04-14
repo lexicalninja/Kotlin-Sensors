@@ -105,8 +105,8 @@ open class CyclingPowerService(gattService: BluetoothGattService, sensor: WeakRe
             private set
 
         override fun valueUpdated() {
-            gattCharacteristic.value?.takeIf { it.isNotEmpty() }?.apply {
-                features = CyclingPowerSerializer.readFeatures(this)
+            gattCharacteristic.value?.takeIf { !it.isEmpty() }?.apply {
+                features = CyclingPowerSerializer.readFeatures(value)
             }
             super.valueUpdated()
             service.get()?.apply {
