@@ -1,23 +1,11 @@
 package com.lexicalninja.kotlinsensors.serializers
 
+import com.lexicalninja.kotlinsensors.FlagStruct
+
 /**
  * Created by Saxton on 7/14/16.
  */
 class CyclingSpeedCadenceSerializer {
-
-    open class FlagStruct {
-        var rawFlags = 0
-        operator fun contains(flagPosition: Int): Boolean {
-            return (rawFlags and (1L shl flagPosition).toInt()) != 0
-        }
-
-        constructor() {}
-
-        constructor(rawFlags: Int) {
-            this.rawFlags = rawFlags
-        }
-    }
-
 
     object MeasurementFlags {
         const val wheelRevolutionDataPresent: Int = 0x1
