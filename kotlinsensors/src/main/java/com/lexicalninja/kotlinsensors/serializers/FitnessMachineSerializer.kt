@@ -13,7 +13,7 @@ const val EPSILON = 0.000000119
 
 class FitnessMachineSerializer {
 
-    object MachineFeatures {
+    object MachineFeaturesFlags {
         const val AverageSpeedSupported = 0
         const val CadenceSupported = 1
         const val TotalDistanceSupported = 2
@@ -33,7 +33,7 @@ class FitnessMachineSerializer {
         const val UserDataRetentionSupported = 16
     }
 
-    object TargetSettingFeatures {
+    object TargetSettingFeaturesFlags {
         const val SpeedTargetSettingSupported = 0
         const val InclinationTargetSettingSupported = 1
         const val ResistanceTargetSettingSupported = 2
@@ -210,6 +210,10 @@ class FitnessMachineSerializer {
         }
 
     }
+
+    class Features(rawFlags: Int):FlagStruct(rawFlags)
+
+    class TargetSettingFeatures(rawFlags: Int):FlagStruct(rawFlags)
 
     class TrainingStatus(rawFlags: Int) : FlagStruct(rawFlags) {
         var status = TrainingStatusField.other

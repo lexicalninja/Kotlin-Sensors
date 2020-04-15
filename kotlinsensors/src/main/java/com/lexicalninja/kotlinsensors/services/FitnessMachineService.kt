@@ -100,15 +100,15 @@ open class FitnessMachineService(gattService: BluetoothGattService, sensor: Weak
             readValue()
         }
 
-        var machine: FitnessMachineSerializer.MachineFeatures? = null
+        var machine: FitnessMachineSerializer.Features? = null
         var targetSettings: FitnessMachineSerializer.TargetSettingFeatures? = null
 
         override fun valueUpdated() {
             val value = gattCharacteristic.value
             value?.apply {
                 val result = FitnessMachineSerializer.readFeatures(value)
-                machine = FitnessMachineSerializer().MachineFeatures(result.machine)
-                targetSettings = FitnessMachineSerializer().TargetSettingFeatures(result.targetSettings)
+                machine = FitnessMachineSerializer.Features(result.machine)
+                targetSettings = FitnessMachineSerializer.TargetSettingFeatures(result.targetSettings)
             }
             super.valueUpdated()
             val serv = service.get()
@@ -186,7 +186,7 @@ open class FitnessMachineService(gattService: BluetoothGattService, sensor: Weak
         }
 
         open fun setIndoorBikeSimulationParameters(windSpeed: Double, grade: Double, crr: Double, crw: Double): ByteArray {
-            val params = FitnessMachineSerializer().IndoorBikeSimulationParameters(windSpeed, grade, crr, crw)
+            val params = FitnessMachineSerializer.IndoorBikeSimulationParameters(windSpeed, grade, crr, crw)
             val bytes = FitnessMachineSerializer.setIndoorBikeSimulationParameters(params)
             // Prevent flooding the characteristic with unnecessary writes
             if (pendingTargetSimParameters == params) return bytes // skipping write, still waiting on MachineStatus Message before clearing
