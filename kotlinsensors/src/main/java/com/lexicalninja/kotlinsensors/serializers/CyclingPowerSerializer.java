@@ -71,7 +71,6 @@ public class CyclingPowerSerializer {
     }
 
     public class MeasurementData implements CyclingMeasurementData {
-        public double timeStamp = 0;
         public short instantaneousPower = 0;
         public
         @Nullable
@@ -151,8 +150,33 @@ public class CyclingPowerSerializer {
         }
 
         @Override
-        public double getTimeStamp() {
-            return timeStamp;
+        public double getTimestamp() {
+            return timestamp;
+        }
+
+        @Override
+        public void setTimestamp(double timestamp) {
+
+        }
+
+        @Override
+        public void setCumulativeCrankRevolutions(@org.jetbrains.annotations.Nullable Integer cumulativeCrankRevolutions) {
+
+        }
+
+        @Override
+        public void setCumulativeWheelRevolutions(@org.jetbrains.annotations.Nullable Integer cumulativeWheelRevolutions) {
+
+        }
+
+        @Override
+        public void setLastCrankEventTime(@org.jetbrains.annotations.Nullable Integer lastCrankEventTime) {
+
+        }
+
+        @Override
+        public void setLastWheelEventTime(@org.jetbrains.annotations.Nullable Short lastWheelEventTime) {
+
         }
     }
 
@@ -234,7 +258,7 @@ public class CyclingPowerSerializer {
                         ((bytes[index++] & 0xFF) << 8));
             }
 
-            measurement.timeStamp = System.currentTimeMillis();
+            measurement.timestamp = System.currentTimeMillis();
         }
         return measurement;
     }
