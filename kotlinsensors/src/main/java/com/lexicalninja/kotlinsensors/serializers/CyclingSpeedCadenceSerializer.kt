@@ -14,13 +14,13 @@ class CyclingSpeedCadenceSerializer {
 
     class Features(private val rawFeatures: Int) : FlagStruct(rawFeatures) {
         val isWheelRevolutionDataSupported: Boolean
-            get() = (rawFeatures and (wheelRevolutionDataSupported and 0xFF)) == wheelRevolutionDataSupported
+            get() = wheelRevolutionDataSupported in this
 
         val isCrankRevolutionDataSupported: Boolean
-            get() = (rawFeatures and (crankRevolutionDataSupported and 0xFF)) == crankRevolutionDataSupported
+            get() = crankRevolutionDataSupported in this
 
         val isMultipleSensorLocationsSupported: Boolean
-            get() = (rawFeatures and (multipleSensorLocationsSupported and 0xFF)) == multipleSensorLocationsSupported
+            get() = multipleSensorLocationsSupported in this
 
         companion object {
             const val wheelRevolutionDataSupported = 0x1
