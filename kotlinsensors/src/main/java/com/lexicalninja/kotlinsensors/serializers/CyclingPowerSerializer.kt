@@ -9,39 +9,39 @@ import com.lexicalninja.kotlinsensors.serializers.CyclingPowerSerializer.Feature
  */
 class CyclingPowerSerializer {
     object MeasurementFlags {
-        const val pedalPowerBalancePresent = 1
-        const val AccumulatedTorquePresent = 1 shl 2
-        const val WheelRevolutionDataPresent = 1 shl 4
-        const val CrankRevolutionDataPresent = 1 shl 5
-        const val ExtremeForceMagnitudesPresent = 1 shl 6
-        const val ExtremeTorqueMagnitudesPresent = 1 shl 7
-        const val ExtremeAnglesPresent = 1 shl 8
-        const val TopDeadSpotAnglePresent = 1 shl 9
-        const val BottomDeadSpotAnglePresent = 1 shl 10
-        const val AccumulatedEnergyPresent = 1 shl 11
-        const val OffsetCompensationIndicator = 1 shl 12
+        const val pedalPowerBalancePresent = 0
+        const val AccumulatedTorquePresent = 2
+        const val WheelRevolutionDataPresent = 4
+        const val CrankRevolutionDataPresent = 5
+        const val ExtremeForceMagnitudesPresent = 6
+        const val ExtremeTorqueMagnitudesPresent = 7
+        const val ExtremeAnglesPresent = 8
+        const val TopDeadSpotAnglePresent = 9
+        const val BottomDeadSpotAnglePresent = 10
+        const val AccumulatedEnergyPresent = 11
+        const val OffsetCompensationIndicator = 12
     }
 
     object FeaturesFlags {
-        const val PedalPowerBalanceSupported = 1
-        const val AccumulatedTorqueSupported = 1 shl 1
-        const val WheelRevolutionDataSupported = 1 shl 2
-        const val CrankRevolutionDataSupported = 1 shl 3
-        const val ExtremeMagnitudesSupported = 1 shl 4
-        const val ExtremeAnglesSupported = 1 shl 5
-        const val TopAndBottomDeadSpotAnglesSupported = 1 shl 6
-        const val AccumulatedEnergySupported = 1 shl 7
-        const val OffsetCompensationIndicatorSupported = 1 shl 8
-        const val OffsetCompensationSupported = 1 shl 9
-        const val ContentMaskingSupported = 1 shl 10
-        const val MultipleSensorLocationsSupported = 1 shl 11
-        const val CrankLengthAdjustmentSupported = 1 shl 12
-        const val ChainLengthAdjustmentSupported = 1 shl 13
-        const val ChainWeightAdjustmentSupported = 1 shl 14
-        const val SpanLengthAdjustmentSupported = 1 shl 15
-        const val SensorMeasurementContext = 1 shl 16
-        const val InstantaneousMeasurementDirectionSupported = 1 shl 17
-        const val FactoryCalibrationDateSupported = 1 shl 18
+        const val PedalPowerBalanceSupported = 0
+        const val AccumulatedTorqueSupported = 1
+        const val WheelRevolutionDataSupported = 2
+        const val CrankRevolutionDataSupported = 3
+        const val ExtremeMagnitudesSupported = 4
+        const val ExtremeAnglesSupported = 5
+        const val TopAndBottomDeadSpotAnglesSupported = 6
+        const val AccumulatedEnergySupported = 7
+        const val OffsetCompensationIndicatorSupported = 8
+        const val OffsetCompensationSupported = 9
+        const val ContentMaskingSupported = 10
+        const val MultipleSensorLocationsSupported = 11
+        const val CrankLengthAdjustmentSupported = 12
+        const val ChainLengthAdjustmentSupported = 13
+        const val ChainWeightAdjustmentSupported = 14
+        const val SpanLengthAdjustmentSupported = 15
+        const val SensorMeasurementContext = 16
+        const val InstantaneousMeasurementDirectionSupported = 17
+        const val FactoryCalibrationDateSupported = 18
     }
 
     class Features(rawFlags: Int) : FlagStruct(rawFlags) {

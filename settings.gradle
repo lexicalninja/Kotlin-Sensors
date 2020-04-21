@@ -1,2 +1,3 @@
 rootProject.name='KotlinSensors'
+include ':app'
 include ':kotlinsensors'
