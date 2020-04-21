@@ -25,7 +25,7 @@ open class FlagStruct {
     internal var rawFlags: Int = 0
 
     operator fun contains(flagPosition: Int): Boolean {
-        return (rawFlags and (1L shl flagPosition).toInt()) != 0
+        return (rawFlags and ((1L shl flagPosition) and 0xFF).toInt()) != 0
     }
 
     constructor() {}

@@ -79,8 +79,8 @@ class CyclingPowerSerializer {
         fun readFeatures(bytes: ByteArray): Features {
             val rawFeatures: Int = (bytes[0].toInt() and 0xFFFF) or
                     ((bytes[1].toInt() and 0xFFFF) shl 8) or
-                    (bytes[2].toInt() and 0xFFFF shl 16) or
-                    (bytes[3].toInt() and 0xFFFF shl 24)
+                    ((bytes[2].toInt() and 0xFFFF) shl 16) or
+                    ((bytes[3].toInt() and 0xFFFF) shl 24)
             return Features(rawFeatures)
         }
 
