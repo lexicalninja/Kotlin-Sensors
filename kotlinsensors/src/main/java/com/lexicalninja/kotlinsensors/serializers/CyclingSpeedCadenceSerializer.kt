@@ -12,7 +12,7 @@ class CyclingSpeedCadenceSerializer {
         const val crankRevolutionDataPresent: Int = 0x2
     }
 
-    class Features(private val rawFeatures: Int) : FlagStruct(rawFeatures) {
+    class Features(rawFeatures: Int) : FlagStruct(rawFeatures) {
         val isWheelRevolutionDataSupported: Boolean
             get() = wheelRevolutionDataSupported in this
 
