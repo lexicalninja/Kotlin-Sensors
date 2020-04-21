@@ -93,16 +93,16 @@ class CyclingPowerSerializer {
 
                 measurement.instantaneousPower = ((bytes[index++].toInt() and 0xFF) or
                         (bytes[index++].toInt() and 0xFF)).toShort()
-                if (rawFlags and MeasurementFlags.pedalPowerBalancePresent == MeasurementFlags.pedalPowerBalancePresent) {
+                if (rawFlags and (1 shl MeasurementFlags.pedalPowerBalancePresent) != 0) {
                     measurement.pedalPowerBalance = bytes[index++]
 
                     measurement.pedalPowerBalanceReference = rawFlags and 0x2 == 0x2
                 }
-                if (rawFlags and MeasurementFlags.AccumulatedTorquePresent == MeasurementFlags.AccumulatedTorquePresent && bytes.size >= index + 1) {
+                if (rawFlags and (1 shl MeasurementFlags.AccumulatedTorquePresent) != 0 && bytes.size >= index + 1) {
                     measurement.accumulatedTorque = ((bytes[index++].toInt() and 0xFF) or
                             ((bytes[index++].toInt() and 0xFF) shl 8)).toShort()
                 }
-                if (rawFlags and MeasurementFlags.WheelRevolutionDataPresent == MeasurementFlags.WheelRevolutionDataPresent && bytes.size >= index + 6) {
+                if (rawFlags and (1 shl MeasurementFlags.WheelRevolutionDataPresent) != 0 && bytes.size >= index + 6) {
                     measurement.cumulativeWheelRevolutions = ((bytes[index++].toInt() and 0xFF)) or
                             (((bytes[index++].toInt() and 0xFF)) shl 8) or
                             (((bytes[index++].toInt() and 0xFF)) shl 16) or
@@ -111,39 +111,39 @@ class CyclingPowerSerializer {
                     measurement.lastWheelEventTime = ((bytes[index++].toInt() and 0xFF) or
                             ((bytes[index++].toInt() and 0xFF) shl 8)).toShort()
                 }
-                if (rawFlags and MeasurementFlags.CrankRevolutionDataPresent == MeasurementFlags.CrankRevolutionDataPresent && bytes.size >= index + 4) {
+                if (rawFlags and (1 shl MeasurementFlags.CrankRevolutionDataPresent) != 0 && bytes.size >= index + 4) {
                     measurement.cumulativeCrankRevolutions = (bytes[index++].toInt() and 0xFF) or
                             ((bytes[index++].toInt() and 0xFF) shl 8)
                     measurement.lastCrankEventTime = (bytes[index++].toInt() and 0xFF) or
                             ((bytes[index++].toInt() and 0xFF) shl 8)
                 }
-                if (rawFlags and MeasurementFlags.ExtremeForceMagnitudesPresent == MeasurementFlags.ExtremeForceMagnitudesPresent) {
+                if (rawFlags and (1 shl MeasurementFlags.ExtremeForceMagnitudesPresent) != 0) {
                     measurement.maximumForceMagnitude = ((bytes[index++].toInt() and 0xFF) or
                             ((bytes[index++].toInt() and 0xFF) shl 8)).toShort()
                     measurement.minimumForceMagnitude = ((bytes[index++].toInt() and 0xFF) or
                             ((bytes[index++].toInt() and 0xFF) shl 8)).toShort()
                 }
-                if (rawFlags and MeasurementFlags.ExtremeTorqueMagnitudesPresent == MeasurementFlags.ExtremeTorqueMagnitudesPresent) {
+                if (rawFlags and (1 shl MeasurementFlags.ExtremeTorqueMagnitudesPresent) != 0) {
                     measurement.maximumTorqueMagnitude = ((bytes[index++].toInt() and 0xFF) or
                             ((bytes[index++].toInt() and 0xFF) shl 8)).toShort()
                     measurement.minimumTorqueMagnitude = ((bytes[index++].toInt() and 0xFF) or
                             ((bytes[index++].toInt() and 0xFF) shl 8)).toShort()
                 }
-                if (rawFlags and MeasurementFlags.ExtremeAnglesPresent == MeasurementFlags.ExtremeAnglesPresent) {
+                if (rawFlags and (1 shl MeasurementFlags.ExtremeAnglesPresent )!= 0) {
                     measurement.minimumAngle = ((bytes[index++].toInt() and 0xFF) or
                             (bytes[index].toInt() and 0xF0 shl 4)).toShort()
                     measurement.maximumAngle = ((bytes[index++].toInt() and 0xFF) or
                             ((bytes[index++].toInt() and 0xFF) shl 4)).toShort()
                 }
-                if (rawFlags and MeasurementFlags.TopDeadSpotAnglePresent == MeasurementFlags.TopDeadSpotAnglePresent) {
+                if (rawFlags and (1 shl MeasurementFlags.TopDeadSpotAnglePresent)!= 0) {
                     measurement.topDeadSpotAngle = ((bytes[index++].toInt() and 0xFF) or
                             ((bytes[index++].toInt() and 0xFF) shl 8)).toShort()
                 }
-                if (rawFlags and MeasurementFlags.BottomDeadSpotAnglePresent == MeasurementFlags.BottomDeadSpotAnglePresent) {
+                if (rawFlags and (1 shl MeasurementFlags.BottomDeadSpotAnglePresent)!= 0) {
                     measurement.bottomDeadSpotAngle = ((bytes[index++].toInt() and 0xFF) or
                             ((bytes[index++].toInt() and 0xFF) shl 8)).toShort()
                 }
-                if (rawFlags and MeasurementFlags.AccumulatedEnergyPresent == MeasurementFlags.AccumulatedEnergyPresent) {
+                if (rawFlags and (1 shl MeasurementFlags.AccumulatedEnergyPresent)!= 0) {
                     measurement.accumulatedEnergy = ((bytes[index++].toInt() and 0xFF) or
                             ((bytes[index++].toInt() and 0xFF) shl 8)).toShort()
                 }
