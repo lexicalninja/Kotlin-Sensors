@@ -624,11 +624,11 @@ class FitnessMachineSerializer {
                         message.spinDownStatus = SpinDownStatus.getFromBits(bytes[1].toInt() and 0xFF)
                         if (message.spinDownStatus == SpinDownStatus.success && bytes.size > 3) {
 //                        Milliseconds attached, convert to seconds
-                            message.spinDownTime = ((bytes[2].toInt() and 0xFF) or ((bytes[3].toInt() and 0xFF)) shl 8) as Double / 1000.0
+                            message.spinDownTime = ((bytes[2].toInt() and 0xFF) or ((bytes[3].toInt() and 0xFF)) shl 8).toDouble() / 1000.0
                         }
                         if (message.spinDownStatus == SpinDownStatus.error && bytes.size > 3) {
 //                        Milliseconds attached, convert to seconds
-                            message.spinDownTime = ((bytes[2].toInt() and 0xFF) or ((bytes[3].toInt() and 0xFF)) shl 8) as Double / 1000.0
+                            message.spinDownTime = ((bytes[2].toInt() and 0xFF) or ((bytes[3].toInt() and 0xFF)) shl 8).toDouble() / 1000.0
                         }
                     }
                 }
