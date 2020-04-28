@@ -8,8 +8,8 @@ import com.lexicalninja.kotlinsensors.FlagStruct
 class CyclingSpeedCadenceSerializer {
 
     object MeasurementFlags {
-        const val wheelRevolutionDataPresent: Int = 0x1
-        const val crankRevolutionDataPresent: Int = 0x2
+        const val wheelRevolutionDataPresent: Int = 0
+        const val crankRevolutionDataPresent: Int = 1
     }
 
     class Features(rawFeatures: Int) : FlagStruct(rawFeatures) {
@@ -23,9 +23,9 @@ class CyclingSpeedCadenceSerializer {
             get() = multipleSensorLocationsSupported in this
 
         companion object {
-            const val wheelRevolutionDataSupported = 0x1
-            const val crankRevolutionDataSupported = 0x2
-            const val multipleSensorLocationsSupported = 0x4
+            const val wheelRevolutionDataSupported = 0
+            const val crankRevolutionDataSupported = 1
+            const val multipleSensorLocationsSupported = 2
         }
 
     }
