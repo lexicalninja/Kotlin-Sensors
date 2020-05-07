@@ -141,8 +141,18 @@ open class FitnessMachineService(gattService: BluetoothGattService, sensor: Weak
         }
 
         var response: FitnessMachineSerializer.ControlPointResponse? = null
+        var hasControl: Boolean = false
+
         override fun valueUpdated() {
             response = FitnessMachineSerializer.readControlPointResponse(gattCharacteristic.value)
+
+            // check to see if we have control
+            if (response?.requestOpCode == FitnessMachineSerializer.ControlOpCode.requestControl ) {
+                hasControl = response?.resultCode == FitnessMachineSerializer.ResultCode.success
+            } else if (response?.resultCode == FitnessMachineSerializer.ResultCode.controlNotPermitted){
+                hasControl = false
+            }
+
             super.valueUpdated()
         }
 
