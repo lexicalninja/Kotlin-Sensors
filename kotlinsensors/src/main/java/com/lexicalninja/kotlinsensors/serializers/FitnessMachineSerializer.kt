@@ -375,7 +375,7 @@ class FitnessMachineSerializer {
 
         fun setTargetResistanceLevel(level: Double): ByteArray {
 //        level = unitless      res 0.1
-            val levelN = level.toInt() * 10
+            val levelN = (level * 10).toInt()
             return byteArrayOf(
                     (ControlOpCode.setTargetResistanceLevel.bits and 0xFF).toByte(),
                     (levelN and 0xFF).toByte(),
