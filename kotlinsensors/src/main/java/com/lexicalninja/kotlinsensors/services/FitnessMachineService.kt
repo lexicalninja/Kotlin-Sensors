@@ -246,7 +246,8 @@ open class FitnessMachineService(gattService: BluetoothGattService, sensor: Weak
         var message by Delegates.observable<FitnessMachineSerializer.MachineStatusMessage?>(null) { _, _, new ->
             new?.run {
                 when (this.opCode) {
-                    targetPowerChanged -> (service.get() as? FitnessMachineService)?.controlPoint?.pendingTargetPower = null
+                    targetPowerChanged ->
+                        (service.get() as? FitnessMachineService)?.controlPoint?.pendingTargetPower = null
                     targetResistancLevelChanged ->
                         (service.get() as? FitnessMachineService)?.controlPoint?.pendingTargetResistanceLevel = null
                     indoorBikeSimulationParametersChanged ->
