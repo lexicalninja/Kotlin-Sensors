@@ -48,8 +48,8 @@ class CyclingSpeedCadenceSerializer {
         fun readMeasurement(bytes: ByteArray): MeasurementData {
             val measurement = MeasurementData()
             var index = 0
-            val rawFlags = bytes[index++]
-            if ((rawFlags.toInt() and MeasurementFlags.wheelRevolutionDataPresent) == MeasurementFlags.wheelRevolutionDataPresent) {
+            val rawFlags = FlagStruct(bytes[index++].toInt())
+            if (rawFlags.contains(MeasurementFlags.wheelRevolutionDataPresent)) {
                 measurement.cumulativeWheelRevolutions =
                     (bytes[index++].toInt() and 0xFF) or
                             ((bytes[index++].toInt() and 0xFF) shl 8) or
@@ -58,7 +58,7 @@ class CyclingSpeedCadenceSerializer {
                 measurement.lastWheelEventTime = ((bytes[index++].toInt() and 0xff) or
                         ((bytes[index++].toInt() and 0xff) shl 8)).toShort()
             }
-            if ((rawFlags.toInt() and MeasurementFlags.crankRevolutionDataPresent) == MeasurementFlags.crankRevolutionDataPresent) {
+            if (rawFlags.contains(MeasurementFlags.crankRevolutionDataPresent)) {
                 measurement.cumulativeCrankRevolutions = (bytes[index++].toInt() and 0xFF) or
                         ((bytes[index++].toInt() and 0xFF) shl 8)
                 measurement.lastCrankEventTime = (bytes[index++].toInt() and 0xFF) or
